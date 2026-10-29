@@ -58,6 +58,8 @@ main{position:relative;z-index:3;margin-top:-60px;padding-bottom:50px}
 .kf{display:flex;gap:8px;margin:14px 0 6px}.kf input{flex:1;border-radius:6px}
 .hint{color:var(--mut);font-size:12px;line-height:1.6}
 footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 4% 90px;border-top:1px solid #121b12}
+.of{display:grid;gap:8px;margin-top:6px}.of input,.of textarea{border-radius:6px;width:100%}.of textarea{background:#0d130dcc;border:1px solid #1d2b1d;color:var(--tx);padding:8px 12px;font:inherit;font-size:14px;min-height:70px}
+.oi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;background:#0a100a;border-radius:6px;margin-top:6px;font-size:13px}.oi button{background:none;border:0;color:#ff6b6b;cursor:pointer;font-size:15px}
 @media(max-width:800px){nav{display:none}#q{width:130px}.hero{min-height:72vh}.hpo{display:none!important}}
 </style>
 </head>
@@ -81,14 +83,26 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 4% 90px;bo
   <button class="btn p" id="hplay">▶ Play</button><button class="btn o" id="hinfo">ⓘ More Info</button></div>
 </section>
 <main id="rows"></main>
-<footer>© 2026 boxTV. All rights reserved.<br>Movie data provided by OMDb API.</footer>
+<footer>© 2026 boxTV. All rights reserved.<br>Movie data provided by OMDb API.<br><a href="#" id="ownerBtn" style="color:#3a4d3a;font-size:11px;text-decoration:none">Owner</a></footer>
 
 <div id="setup"><span id="sm">Demo mode – connect your OMDb API key</span><button class="btn p" id="setupBtn">Add key</button></div>
 
-<div class="md" id="md"><div class="box"><button class="x" id="mx" aria-label="Close">✕</button>
+<div class="md" id="md"><div class="box"><button class="x" id="mx" aria-label="Close">✕</button><div id="pv"></div>
 <div class="dh"><div id="mimg"></div><div><h3 id="mh"></h3><div class="meta" id="mm"></div></div></div>
-<div class="bd"><p class="info" id="mi"></p><p id="mp" style="color:#cfdccf;line-height:1.8;margin-bottom:16px"></p><button class="btn p">▶ Play</button></div></div></div>
+<div class="bd"><p class="info" id="mi"></p><p id="mp" style="color:#cfdccf;line-height:1.8;margin-bottom:16px"></p><button class="btn p" id="mplay" style="display:none">▶ Play</button></div></div></div>
 
+<div class="md" id="od"><div class="box"><button class="x" id="oc" aria-label="Close">✕</button><div class="bd" style="padding-top:24px">
+  <h3 style="margin-bottom:6px">Owner panel</h3>
+  <p class="hint">Add your own titles by link. They show in the row “boxTV Originals”.</p>
+  <div class="kf"><input id="oi" placeholder="Paste IMDb link (optional, auto-fills)"><button class="btn o" id="oimp" style="margin:0">Import</button></div>
+  <div class="of"><input id="ot" placeholder="Title *"><input id="oy" placeholder="Year"><input id="og" placeholder="Genre"><input id="op" placeholder="Poster image link (https://…)"><input id="ov" placeholder="Video link (YouTube or .mp4)"><textarea id="od2" placeholder="Description"></textarea></div>
+  <button class="btn p" id="oadd" style="margin:10px 0 6px">Add to site</button>
+  <p class="hint" id="om"></p>
+  <div id="ol"></div>
+  <p class="hint" style="margin-top:12px">Items you add are saved in <b>this browser</b>. To show them to <b>all visitors</b>: tap Copy, then paste into <b>library.json</b> on GitHub.</p>
+  <textarea id="oj" readonly style="width:100%;height:80px;margin:8px 0;background:#0a100a;color:var(--mut);border:1px solid #1d2b1d;border-radius:6px;padding:8px;font:12px monospace"></textarea>
+  <button class="btn o" id="ocopy">Copy library.json</button>
+</div></div></div>
 <div class="md" id="kd"><div class="box"><div class="bd" style="padding-top:24px">
   <h3 style="margin-bottom:8px">Connect OMDb</h3>
   <p class="hint">Paste your OMDb API key to load real posters and movie plots. Free keys: omdbapi.com/apikey.aspx</p>
@@ -101,7 +115,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 4% 90px;bo
 /* ====== CONFIG ====== */
 const OMDB_KEY = "d9aa9800";   // paste your OMDb key here for production
 /* Each row = [title shown, search keyword]. Edit freely. */
-const ROWS = [["Batman","batman"],["Star Wars","star wars"],["Harry Potter","harry potter"],["Space","space"],["Mission","mission impossible"]];
+const ROWS = [["New in 2026","the",2026],["2025 Releases","the",2025],["Love & Drama","love",2025],["Night & Action","night",2025],["Space & Future","space",2024]];  // [title, keyword, year]
 const OMDB = "https://www.omdbapi.com/";
 
 const demo = [
@@ -121,7 +135,7 @@ try{ key = OMDB_KEY || localStorage.getItem("boxtv_omdb") || ""; }catch(e){}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const grad=m=>`linear-gradient(135deg,hsl(${m.hue||150} 70% 22%),hsl(${((m.hue||150)+50)%360} 80% 8%) 70%),radial-gradient(circle at 70% 20%,hsl(${m.hue||150} 100% 45%/.5),transparent 55%)`;
-const bg=m=>m.poster?`url("${m.poster}")`:grad(m);
+const bg=m=>m.poster?`url("${String(m.poster).replace(/["\\\n]/g,"")}")`:grad(m);
 
 async function api(params){
   const r=await fetch(OMDB+"?apikey="+encodeURIComponent(key)+"&"+params);
@@ -133,8 +147,8 @@ async function api(params){
 const norm=x=>({id:x.imdbID,title:x.Title,year:x.Year,poster:x.Poster&&x.Poster!=="N/A"?x.Poster:null,rate:"",genre:"",desc:"",hue:150,full:false});
 const cget=k=>{try{const v=JSON.parse(localStorage.getItem(k));if(v&&Date.now()-v.t<216e5)return v.d}catch(e){}return null};
 const cset=(k,d)=>{try{localStorage.setItem(k,JSON.stringify({t:Date.now(),d}))}catch(e){}};
-async function search(q){ const ck="s:"+q; const c=cget(ck); if(c) return c;
-  const j=await api("s="+encodeURIComponent(q)+"&type=movie"); const res=j&&j.Search?j.Search.map(norm):[]; if(res.length) cset(ck,res); return res; }
+async function search(q,y){ const ck="s:"+q+":"+(y||""); const c=cget(ck); if(c) return c;
+  const j=await api("s="+encodeURIComponent(q)+"&type=movie"+(y?"&y="+y:"")); const res=j&&j.Search?j.Search.map(norm):[]; if(res.length) cset(ck,res); return res; }
 async function detail(m){
   if(m.full) return m;
   const ck="i:"+m.id; let j=cget(ck); if(!j){ j=await api("i="+encodeURIComponent(m.id)+"&plot=full"); if(j) cset(ck,j); } if(!j) return m;
@@ -150,7 +164,7 @@ function useDemo(msg){
 async function load(){
   if(!key){ useDemo(); return ""; }
   try{
-    rows=(await Promise.all(ROWS.map(async([t,q])=>[t,await search(q)]))).filter(r=>r[1].length);
+    rows=(await Promise.all(ROWS.map(async([t,q,y])=>[t,(await search(q,y)).filter(m=>m.poster)]))).filter(r=>r[1].length);
     all=rows.flatMap(r=>r[1]); if(!all.length) throw new Error("No results found");
     $("setup").style.display="none"; return "";
   }catch(err){
@@ -186,14 +200,15 @@ function fill(m){
   $("mimg").innerHTML=m.poster?`<img src="${esc(m.poster)}" alt="" style="width:130px;aspect-ratio:2/3;border-radius:8px;object-fit:cover">`:`<div class="ph" style="background:${grad(m)}"></div>`;
   $("mi").innerHTML=[m.dir?`<b>Director:</b> ${esc(m.dir)}`:"",m.cast?`<b>Cast:</b> ${esc(m.cast)}`:""].filter(Boolean).join("<br>");
   $("mp").textContent=m.desc||"Loading…";
+  $("pv").innerHTML=""; $("mplay").style.display=m.video?"inline-block":"none"; $("mplay").onclick=()=>play(m.video);
 }
 async function open(m){
   cur=m.id; fill(m); $("md").classList.add("on");
   if(!m.full){ try{ await detail(m); if(cur===m.id) fill(m); }catch(e){ if(cur===m.id) $("mp").textContent="Could not load details."; } }
 }
-const closeM=()=>{cur=null;$("md").classList.remove("on");$("kd").classList.remove("on")};
-$("mx").onclick=$("kc").onclick=closeM;
-[$("md"),$("kd")].forEach(e=>e.onclick=ev=>{if(ev.target===e)closeM()});
+const closeM=()=>{cur=null;$("pv").innerHTML="";["md","kd","od"].forEach(i=>$(i).classList.remove("on"))};
+$("mx").onclick=$("kc").onclick=$("oc").onclick=closeM;
+[$("md"),$("kd"),$("od")].forEach(e=>e.onclick=ev=>{if(ev.target===e)closeM()});
 addEventListener("keydown",e=>{if(e.key==="Escape")closeM()});
 $("setupBtn").onclick=()=>$("kd").classList.add("on");
 $("ks").onclick=async()=>{
@@ -209,7 +224,52 @@ let tm; $("q").oninput=e=>{ clearTimeout(tm); const v=e.target.value.trim();
   },450);
 };
 addEventListener("scroll",()=>$("hd").classList.toggle("s",scrollY>40));
-async function init(){ const err=await load(); nav(); render(rows); hero(all[0]); return err; }
+async function init(){ const err=await load(); await addLib(); nav(); render(rows); hero(all[0]); return err; }
+/* ===== library + owner tools ===== */
+const OWNER_HASH="b63dd8372f9cc671a4e8ffc4420c261868474d13773ce615b3381c6beb5fa687";
+const sha=async t=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("");
+let mine=[]; try{ mine=JSON.parse(localStorage.getItem("boxtv_mine")||"[]"); }catch(e){}
+const saveMine=()=>{ try{localStorage.setItem("boxtv_mine",JSON.stringify(mine))}catch(e){} };
+const okUrl=u=>!u||/^https?:\/\//i.test(u);
+async function addLib(){
+  let file=[]; try{ const r=await fetch("library.json",{cache:"no-store"}); if(r.ok) file=await r.json(); }catch(e){}
+  const items=[...(Array.isArray(file)?file:[]),...mine].filter(o=>o&&o.title&&okUrl(o.poster)&&okUrl(o.video))
+    .map((o,i)=>({id:"u"+i,year:"",genre:"",desc:"",poster:null,video:"",...o,rate:"",hue:150,full:true}));
+  if(items.length){ rows.unshift(["boxTV Originals",items]); all=all.concat(items); }
+}
+function play(u){
+  const pv=$("pv"); pv.innerHTML=""; if(!/^https?:\/\//i.test(u||"")) return;
+  const y=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+  if(y){ const f=document.createElement("iframe"); f.src="https://www.youtube.com/embed/"+y[1]+"?autoplay=1"; f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen"; f.allowFullscreen=true; f.style.cssText="width:100%;aspect-ratio:16/9;border:0;display:block"; pv.appendChild(f); }
+  else if(/\.(mp4|webm|ogg)(\?|$)/i.test(u)){ const v=document.createElement("video"); v.src=u; v.controls=true; v.autoplay=true; v.style.cssText="width:100%;display:block;background:#000"; pv.appendChild(v); }
+  else window.open(u,"_blank","noopener");
+}
+function listMine(){
+  const L=$("ol"); L.innerHTML="";
+  mine.forEach((m,i)=>{ const d=document.createElement("div"); d.className="oi"; const s=document.createElement("span"); s.textContent=m.title+(m.year?" ("+m.year+")":"");
+    const b=document.createElement("button"); b.textContent="✕"; b.onclick=()=>{ mine.splice(i,1); saveMine(); listMine(); init(); }; d.append(s,b); L.appendChild(d); });
+  $("oj").value=JSON.stringify(mine,null,1);
+}
+$("ownerBtn").onclick=async e=>{ e.preventDefault(); const p=prompt("Owner password"); if(p===null) return;
+  if(await sha(p)===OWNER_HASH){ listMine(); $("om").textContent=""; $("od").classList.add("on"); } else alert("Wrong password"); };
+$("oadd").onclick=()=>{
+  const g=i=>$(i).value.trim(), t=g("ot");
+  if(!t){ $("om").textContent="Title is required."; return; }
+  if(!okUrl(g("op"))||!okUrl(g("ov"))){ $("om").textContent="Links must start with https://"; return; }
+  mine.push({title:t,year:g("oy"),genre:g("og"),poster:g("op"),video:g("ov"),desc:g("od2")}); saveMine();
+  ["ot","oy","og","op","ov","od2","oi"].forEach(i=>$(i).value=""); $("om").textContent="Added ✓"; listMine(); init();
+};
+$("oimp").onclick=async()=>{
+  const id=($("oi").value.match(/tt\d{6,10}/)||[])[0];
+  if(!id){ $("om").textContent="No IMDb ID found in the link."; return; }
+  if(!key){ $("om").textContent="Add your OMDb key first."; return; }
+  try{ const j=await api("i="+id+"&plot=full"); if(!j){ $("om").textContent="Not found."; return; }
+    const ok=v=>v&&v!=="N/A"?v:"";
+    $("ot").value=ok(j.Title); $("oy").value=ok(j.Year); $("og").value=ok(j.Genre); $("op").value=ok(j.Poster); $("od2").value=ok(j.Plot);
+    $("om").textContent="Imported. Add your video link, then press Add."; }catch(e){ $("om").textContent=e.message; }
+};
+$("ocopy").onclick=()=>{ const t=$("oj"); t.select(); try{ navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand("copy"); } $("om").textContent="Copied – paste it into library.json on GitHub."; };
+
 init();
 </script>
 </body>
