@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>boxTV – Stream Movies</title>
+<style>
+:root{color-scheme:dark;--bg:#050805;--panel:#0d130d;--g:#00e676;--tx:#f1f7f1;--mut:#8fa28f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:"Segoe UI",Helvetica,Arial,sans-serif;min-height:100vh}
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:22px;padding:14px 4%;padding-top:calc(14px + env(safe-area-inset-top,0px));background:linear-gradient(#050805ee,#0500);transition:background .3s}
+header.s{background:#050805f2}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:26px;text-decoration:none;color:var(--tx)}
+.logo b{color:var(--g)}
+.logo svg{width:34px;height:34px;filter:drop-shadow(0 0 8px #00e67666)}
+nav{display:flex;gap:18px;font-size:14px;color:var(--mut)}
+nav a{color:inherit;text-decoration:none}nav a:hover{color:var(--g)}
+.sp{flex:1}
+input{background:#0d130dcc;border:1px solid #1d2b1d;color:var(--tx);padding:8px 14px;border-radius:20px;font:inherit;font-size:14px}
+input:focus{outline:none;border-color:var(--g)}
+#q{width:190px}
+.hero{position:relative;min-height:80vh;display:flex;align-items:flex-end;padding:0 4% 90px;overflow:hidden}
+.hero .bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(28px) saturate(1.2);opacity:.55}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 4%,#0500 55%),linear-gradient(90deg,#050805e0 10%,#0500 75%)}
+.hero .in{position:relative;z-index:2;max-width:560px}
+.hpo{position:absolute;z-index:2;right:7%;bottom:100px;height:58%;max-height:480px;aspect-ratio:2/3;object-fit:cover;border-radius:10px;box-shadow:0 20px 60px #000,0 0 0 1px #00e67655;display:none}
+.hero h1{font-size:clamp(32px,5.5vw,60px);line-height:1.1;margin-bottom:12px;text-shadow:0 2px 20px #000}
+.meta{display:flex;gap:12px;color:var(--mut);font-size:14px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.m{color:var(--g);font-weight:700}
+.hero p{color:#cfdccf;line-height:1.7;margin-bottom:20px;font-size:15px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.btn{border:0;border-radius:6px;padding:11px 26px;font:inherit;font-weight:700;cursor:pointer;margin-right:10px;font-size:15px}
+.p{background:var(--g);color:#031a0c}.p:hover{background:#5dffa8}
+.o{background:#ffffff1f;color:var(--tx)}.o:hover{background:#ffffff33}
+main{position:relative;z-index:3;margin-top:-60px;padding-bottom:50px}
+.row{margin:0 0 26px}
+.row h2{font-size:19px;padding:0 4% 8px;display:flex;align-items:center;gap:8px}
+.row h2::before{content:"";width:4px;height:18px;background:var(--g);border-radius:2px}
+.sc{display:flex;gap:10px;overflow-x:auto;padding:8px 4% 18px;scrollbar-width:none}
+.sc::-webkit-scrollbar{display:none}
+.card{flex:0 0 clamp(130px,16vw,200px);aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;background-size:cover;background-position:center;background-color:#0d130d}
+.card:hover{transform:scale(1.07);z-index:5;box-shadow:0 10px 30px #000,0 0 0 2px var(--g)}
+.card .t{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 10px;background:linear-gradient(#0000,#000d);font-size:13px;font-weight:700}
+.card .t small{display:block;color:var(--g);font-weight:400;margin-top:2px}
+.gl{position:absolute;inset:0;display:grid;place-items:center;font-size:44px;opacity:.18}
+.empty{padding:20px 4%;color:var(--mut)}
+.md{position:fixed;inset:0;background:#000b;z-index:50;display:none;place-items:center;padding:16px}
+.md.on{display:grid}
+.box{background:var(--panel);border:1px solid #1d2b1d;border-radius:12px;max-width:660px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 0 60px #00e67622}
+.dh{display:flex;gap:18px;padding:24px 24px 0}
+.dh img,.dh .ph{width:130px;aspect-ratio:2/3;border-radius:8px;object-fit:cover;flex:none;background:#142014}
+.box h3{font-size:25px;margin-bottom:8px}
+.bd{padding:16px 24px 24px}
+.x{position:sticky;float:right;top:10px;margin:10px 10px 0 0;z-index:3;background:#000a;color:#fff;border:0;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px}
+.info{color:var(--mut);font-size:13px;line-height:1.7;margin-bottom:14px}.info b{color:var(--tx)}
+#setup{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:#0d130df2;border:1px solid var(--g);border-radius:30px;padding:8px 8px 8px 18px;display:flex;gap:12px;align-items:center;font-size:13px;box-shadow:0 0 30px #00e67633;width:max-content;max-width:94vw}
+#setup .btn{padding:7px 16px;font-size:13px;margin:0;flex:none}
+.kf{display:flex;gap:8px;margin:14px 0 6px}.kf input{flex:1;border-radius:6px}
+.hint{color:var(--mut);font-size:12px;line-height:1.6}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 4% 90px;border-top:1px solid #121b12}
+@media(max-width:800px){nav{display:none}#q{width:130px}.hero{min-height:72vh}.hpo{display:none!important}}
+</style>
+</head>
+<body>
+<header id="hd">
+  <a class="logo" href="#top" aria-label="boxTV">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M24 4 6 13v22l18 9 18-9V13L24 4Z" fill="#0d130d" stroke="#00e676" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M6 13l18 9 18-9M24 22v22" stroke="#00e676" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M15 8.5l18 9v6.5l-4 2v-6.5L11 10.5" fill="#00e67633" stroke="#00e676" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+    <span>box<b>TV</b></span>
+  </a>
+  <nav id="nav"></nav>
+  <div class="sp"></div>
+  <input id="q" type="search" placeholder="Search movies…">
+</header>
+
+<section class="hero" id="top"><div class="bg" id="hb"></div><img class="hpo" id="hpo" alt="">
+  <div class="in"><h1 id="ht"></h1><div class="meta" id="hm"></div><p id="hp"></p>
+  <button class="btn p" id="hplay">▶ Play</button><button class="btn o" id="hinfo">ⓘ More Info</button></div>
+</section>
+<main id="rows"></main>
+<footer>© 2026 boxTV. All rights reserved.<br>Movie data provided by OMDb API.</footer>
+
+<div id="setup"><span id="sm">Demo mode – connect your OMDb API key</span><button class="btn p" id="setupBtn">Add key</button></div>
+
+<div class="md" id="md"><div class="box"><button class="x" id="mx" aria-label="Close">✕</button>
+<div class="dh"><div id="mimg"></div><div><h3 id="mh"></h3><div class="meta" id="mm"></div></div></div>
+<div class="bd"><p class="info" id="mi"></p><p id="mp" style="color:#cfdccf;line-height:1.8;margin-bottom:16px"></p><button class="btn p">▶ Play</button></div></div></div>
+
+<div class="md" id="kd"><div class="box"><div class="bd" style="padding-top:24px">
+  <h3 style="margin-bottom:8px">Connect OMDb</h3>
+  <p class="hint">Paste your OMDb API key to load real posters and movie plots. Free keys: omdbapi.com/apikey.aspx</p>
+  <div class="kf"><input id="ki" placeholder="Your OMDb API key"><button class="btn p" id="ks" style="margin:0">Save</button></div>
+  <p class="hint" id="ke"></p>
+  <button class="btn o" id="kc" style="margin-top:10px">Close</button>
+</div></div></div>
+
+<script>
+/* ====== CONFIG ====== */
+const OMDB_KEY = "d9aa9800";   // paste your OMDb key here for production
+/* Each row = [title shown, search keyword]. Edit freely. */
+const ROWS = [["Batman","batman"],["Star Wars","star wars"],["Harry Potter","harry potter"],["Space","space"],["Mission","mission impossible"]];
+const OMDB = "https://www.omdbapi.com/";
+
+const demo = [
+ ["Desert Shadow",2025,8.4,"Action",150,"A hunter crosses endless dunes to uncover a secret that threatens an entire city."],
+ ["City at Night",2024,7.9,"Action",95,"In one night, an ordinary driver becomes the target of a ruthless gang."],
+ ["The Last Falcon",2026,8.1,"Action",120,"An elite team takes on one final mission behind enemy lines."],
+ ["Letters at Sunset",2025,8.7,"Drama",160,"A family uncovers old secrets hidden inside a wooden chest."],
+ ["River of Memory",2024,8.0,"Drama",200,"A woman returns to her village after thirty years to face her past."],
+ ["Silk Threads",2026,8.3,"Drama",140,"A young merchant's journey along the ancient caravan road."],
+ ["Zero Orbit",2026,8.8,"Sci-Fi",130,"A crew discovers a signal arriving from the future."],
+ ["The Green Matrix",2025,8.2,"Sci-Fi",110,"A programmer learns her world is a flawless simulation."],
+ ["Last Planet",2024,7.7,"Sci-Fi",160,"Humanity searches for a new home before time runs out."]
+].map((m,i)=>({id:"d"+i,title:m[0],year:m[1],rate:m[2],genre:m[3],hue:m[4],desc:m[5],full:true}));
+
+let rows=[], all=[], key=OMDB_KEY, cur=null;
+try{ key = OMDB_KEY || localStorage.getItem("boxtv_omdb") || ""; }catch(e){}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const grad=m=>`linear-gradient(135deg,hsl(${m.hue||150} 70% 22%),hsl(${((m.hue||150)+50)%360} 80% 8%) 70%),radial-gradient(circle at 70% 20%,hsl(${m.hue||150} 100% 45%/.5),transparent 55%)`;
+const bg=m=>m.poster?`url("${m.poster}")`:grad(m);
+
+async function api(params){
+  const r=await fetch(OMDB+"?apikey="+encodeURIComponent(key)+"&"+params);
+  if(!r.ok) throw new Error(r.status===401?"Invalid API key":"Request failed ("+r.status+")");
+  const j=await r.json();
+  if(j.Response==="False"){ if(/api key|limit/i.test(j.Error||"")) throw new Error(j.Error); return null; }
+  return j;
+}
+const norm=x=>({id:x.imdbID,title:x.Title,year:x.Year,poster:x.Poster&&x.Poster!=="N/A"?x.Poster:null,rate:"",genre:"",desc:"",hue:150,full:false});
+const cget=k=>{try{const v=JSON.parse(localStorage.getItem(k));if(v&&Date.now()-v.t<216e5)return v.d}catch(e){}return null};
+const cset=(k,d)=>{try{localStorage.setItem(k,JSON.stringify({t:Date.now(),d}))}catch(e){}};
+async function search(q){ const ck="s:"+q; const c=cget(ck); if(c) return c;
+  const j=await api("s="+encodeURIComponent(q)+"&type=movie"); const res=j&&j.Search?j.Search.map(norm):[]; if(res.length) cset(ck,res); return res; }
+async function detail(m){
+  if(m.full) return m;
+  const ck="i:"+m.id; let j=cget(ck); if(!j){ j=await api("i="+encodeURIComponent(m.id)+"&plot=full"); if(j) cset(ck,j); } if(!j) return m;
+  const ok=v=>v&&v!=="N/A";
+  m.rate=ok(j.imdbRating)?j.imdbRating:""; m.genre=ok(j.Genre)?j.Genre:""; m.runtime=ok(j.Runtime)?j.Runtime:"";
+  m.desc=ok(j.Plot)?j.Plot:"No synopsis available."; m.dir=ok(j.Director)?j.Director:""; m.cast=ok(j.Actors)?j.Actors:"";
+  m.rated=ok(j.Rated)?j.Rated:""; m.full=true; return m;
+}
+function useDemo(msg){
+  all=demo; rows=[["Trending Now",[...demo].sort((a,b)=>b.rate-a.rate)],["Action",demo.filter(m=>m.genre==="Action")],["Drama",demo.filter(m=>m.genre==="Drama")],["Sci-Fi",demo.filter(m=>m.genre==="Sci-Fi")]];
+  $("sm").textContent=msg||"Demo mode – connect your OMDb API key"; $("setup").style.display="flex";
+}
+async function load(){
+  if(!key){ useDemo(); return ""; }
+  try{
+    rows=(await Promise.all(ROWS.map(async([t,q])=>[t,await search(q)]))).filter(r=>r[1].length);
+    all=rows.flatMap(r=>r[1]); if(!all.length) throw new Error("No results found");
+    $("setup").style.display="none"; return "";
+  }catch(err){
+    const msg=err.message==="Failed to fetch"?"Network blocked here – run the site on your own host.":err.message;
+    useDemo("Demo mode – "+msg); return msg;
+  }
+}
+const meta=m=>[m.rate?`<span class="m">★ ${esc(m.rate)}</span>`:"",`<span>${esc(m.year)}</span>`,m.rated?`<span>${esc(m.rated)}</span>`:"",m.runtime?`<span>${esc(m.runtime)}</span>`:"",m.genre?`<span>${esc(m.genre)}</span>`:""].join("");
+function card(m){
+  const d=document.createElement("div");d.className="card";d.style.backgroundImage=bg(m);
+  d.innerHTML=(m.poster?"":'<div class="gl">▣</div>')+'<div class="t"></div>';
+  const t=d.querySelector(".t");t.textContent=m.title;
+  const s=document.createElement("small");s.textContent=(m.rate?"★ "+m.rate+" · ":"")+m.year;t.appendChild(s);
+  d.onclick=()=>open(m);return d;
+}
+function render(list){
+  const R=$("rows");R.innerHTML="";
+  if(!list.length||!list.some(r=>r[1].length)){R.innerHTML='<p class="empty">No movies found.</p>';return;}
+  list.forEach(([t,ms],i)=>{ if(!ms.length)return;
+    const s=document.createElement("section");s.className="row";s.id="r"+i;
+    const h=document.createElement("h2");h.textContent=t;const sc=document.createElement("div");sc.className="sc";
+    ms.forEach(m=>sc.appendChild(card(m)));s.append(h,sc);R.appendChild(s);});
+}
+function nav(){ const n=$("nav");n.innerHTML='<a href="#top">Home</a>'; rows.slice(0,4).forEach(([t],i)=>{const a=document.createElement("a");a.href="#r"+i;a.textContent=t;n.appendChild(a);}); }
+async function hero(m){
+  try{ await detail(m); }catch(e){}
+  $("hb").style.backgroundImage=bg(m);$("ht").textContent=m.title;$("hm").innerHTML=meta(m);$("hp").textContent=m.desc;
+  const po=$("hpo"); if(m.poster){po.src=m.poster;po.style.display="block";}else po.style.display="none";
+  $("hplay").onclick=$("hinfo").onclick=()=>open(m);
+}
+function fill(m){
+  $("mh").textContent=m.title;$("mm").innerHTML=meta(m);
+  $("mimg").innerHTML=m.poster?`<img src="${esc(m.poster)}" alt="" style="width:130px;aspect-ratio:2/3;border-radius:8px;object-fit:cover">`:`<div class="ph" style="background:${grad(m)}"></div>`;
+  $("mi").innerHTML=[m.dir?`<b>Director:</b> ${esc(m.dir)}`:"",m.cast?`<b>Cast:</b> ${esc(m.cast)}`:""].filter(Boolean).join("<br>");
+  $("mp").textContent=m.desc||"Loading…";
+}
+async function open(m){
+  cur=m.id; fill(m); $("md").classList.add("on");
+  if(!m.full){ try{ await detail(m); if(cur===m.id) fill(m); }catch(e){ if(cur===m.id) $("mp").textContent="Could not load details."; } }
+}
+const closeM=()=>{cur=null;$("md").classList.remove("on");$("kd").classList.remove("on")};
+$("mx").onclick=$("kc").onclick=closeM;
+[$("md"),$("kd")].forEach(e=>e.onclick=ev=>{if(ev.target===e)closeM()});
+addEventListener("keydown",e=>{if(e.key==="Escape")closeM()});
+$("setupBtn").onclick=()=>$("kd").classList.add("on");
+$("ks").onclick=async()=>{
+  const v=$("ki").value.trim(); if(!v)return;
+  key=v; $("ke").textContent="Connecting…"; const err=await init();
+  if(err){ $("ke").textContent=err; } else { try{localStorage.setItem("boxtv_omdb",v)}catch(e){} closeM(); }
+};
+let tm; $("q").oninput=e=>{ clearTimeout(tm); const v=e.target.value.trim();
+  if(!v){render(rows);return;}
+  tm=setTimeout(async()=>{
+    if(!key){render([["Search results",demo.filter(m=>m.title.toLowerCase().includes(v.toLowerCase()))]]);return;}
+    try{ render([["Search results",await search(v)]]); }catch(err){ $("rows").innerHTML='<p class="empty"></p>'; $("rows").firstChild.textContent=err.message; }
+  },450);
+};
+addEventListener("scroll",()=>$("hd").classList.toggle("s",scrollY>40));
+async function init(){ const err=await load(); nav(); render(rows); hero(all[0]); return err; }
+init();
+</script>
+</body>
+</html>
